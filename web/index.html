@@ -1,0 +1,404 @@
+<!doctype html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0d100c">
+  <meta name="description" content="Iron & Oath — a private, real-time 1v1 medieval arena duel for two warriors.">
+  <title>Iron &amp; Oath — A Private Duel</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/tailwind.css">
+  <link rel="stylesheet" href="/css/arena.css">
+</head>
+<body class="h-full overflow-hidden">
+  <svg aria-hidden="true" class="svg-defs">
+    <defs>
+      <symbol id="i-swords" viewBox="0 0 24 24">
+        <path d="M4 3h4l10 10-2 2L6 5V3Z"/><path d="M20 3h-4L6 13l2 2L18 5V3Z"/>
+        <path d="M4 17l3 3M6 15l3 3M20 17l-3 3M18 15l-3 3"/>
+      </symbol>
+      <symbol id="i-shield" viewBox="0 0 24 24">
+        <path d="M12 2 20 5v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5l8-3Z"/><path d="M12 6v11M8 9h8"/>
+      </symbol>
+      <symbol id="i-boot" viewBox="0 0 24 24">
+        <path d="M7 3h4l1 9 6 2c2 .7 3 2.3 3 4v3H5v-5l2-3V3Z"/><path d="M5 17h16M9 7h3"/>
+      </symbol>
+      <symbol id="i-copy" viewBox="0 0 24 24">
+        <rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/>
+      </symbol>
+      <symbol id="i-check" viewBox="0 0 24 24"><path d="m4 12 5 5L20 6"/></symbol>
+      <symbol id="i-x" viewBox="0 0 24 24"><path d="M5 5l14 14M19 5 5 19"/></symbol>
+      <symbol id="i-sound" viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4Z"/><path d="M16 8c2 2 2 6 0 8M18.5 5.5c3 3 3 10 0 13"/></symbol>
+      <symbol id="i-mute" viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4Z"/><path d="M16 9l5 6M21 9l-5 6"/></symbol>
+      <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.7 2.7 0 1 1 4.1 2.4c-.9.5-1.6 1.1-1.6 2.1M12 17h.01"/></symbol>
+      <symbol id="i-crown" viewBox="0 0 24 24"><path d="m3 7 4.5 4L12 4l4.5 7L21 7l-2 11H5L3 7Z"/><path d="M5 21h14"/></symbol>
+      <symbol id="i-arrow-left" viewBox="0 0 24 24"><path d="M20 12H5M11 6l-6 6 6 6"/></symbol>
+      <symbol id="i-flag" viewBox="0 0 24 24"><path d="M5 21V4M5 4h12l-2 4 2 4H5"/></symbol>
+      <symbol id="i-wifi" viewBox="0 0 24 24"><path d="M2 8c6-5 14-5 20 0M5.5 12c4-3.5 9-3.5 13 0M9 15.5c2-1.5 4-1.5 6 0M12 19h.01"/></symbol>
+      <symbol id="i-warning" viewBox="0 0 24 24"><path d="M12 3 22 21H2L12 3Z"/><path d="M12 9v5M12 18h.01"/></symbol>
+      <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+      <symbol id="i-fire" viewBox="0 0 24 24"><path d="M12 22c4 0 7-3 7-7 0-3-2-5-3-7-1 2-2 2-3 3 0-4-2-7-4-9 0 5-4 7-4 12 0 5 3 8 7 8Z"/><path d="M12 22c-2 0-3-1.5-3-3 0-2 1-3 3-4 0 2 3 2 3 4s-1 3-3 3Z"/></symbol>
+    </defs>
+  </svg>
+
+  <div id="boot-screen" class="boot-screen">
+    <div class="crest-spinner"><svg><use href="#i-swords"></use></svg></div>
+    <p>Forging the arena…</p>
+  </div>
+
+  <div id="toast-stack" class="toast-stack" aria-live="polite"></div>
+
+  <!-- HOME -->
+  <section id="screen-home" class="screen home-screen">
+    <div class="home-fog home-fog-a"></div>
+    <div class="home-fog home-fog-b"></div>
+    <div class="home-grid-lines"></div>
+
+    <header class="home-header">
+      <div class="brand">
+        <div class="brand-mark"><svg><use href="#i-swords"></use></svg></div>
+        <div class="brand-text"><strong>IRON &amp; OATH</strong><span>A PRIVATE DUEL</span></div>
+      </div>
+      <div class="header-tools">
+        <div id="home-connection" class="conn-pill is-connecting">
+          <span class="conn-dot"></span><span class="conn-label">Connecting</span>
+        </div>
+        <button class="icon-btn" type="button" data-action="toggle-sound" aria-label="Toggle sound" title="Sound">
+          <svg class="sound-on"><use href="#i-sound"></use></svg>
+          <svg class="sound-off"><use href="#i-mute"></use></svg>
+        </button>
+        <button class="icon-btn" type="button" data-modal="help" aria-label="How to play" title="How to play">
+          <svg><use href="#i-help"></use></svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="home-main">
+      <div class="hero-copy">
+        <p class="eyebrow"><span></span> TWO WARRIORS <span></span></p>
+        <h1 class="hero-title"><span>IRON</span><em>&amp;</em><span>OATH</span></h1>
+        <p class="hero-lede">A private arena. A shared room code. No crowd, no mercy — only the weight of steel and the oath you carry into it.</p>
+
+        <div class="hero-roster" id="home-roster" aria-label="The four warriors">
+          <div class="home-warrior" data-character="knight"><canvas width="92" height="92"></canvas><span>Knight</span></div>
+          <div class="home-warrior" data-character="berserker"><canvas width="92" height="92"></canvas><span>Berserker</span></div>
+          <div class="home-warrior" data-character="duelist"><canvas width="92" height="92"></canvas><span>Duelist</span></div>
+          <div class="home-warrior" data-character="guardian"><canvas width="92" height="92"></canvas><span>Guardian</span></div>
+        </div>
+
+        <ul class="hero-features">
+          <li><svg><use href="#i-swords"></use></svg><span><b>Skill-based duels</b>Directional steel, reads, and dodges.</span></li>
+          <li><svg><use href="#i-shield"></use></svg><span><b>Survive the exchange</b>Block the line, punish the whiff.</span></li>
+          <li><svg><use href="#i-boot"></use></svg><span><b>Play anywhere</b>Keyboard or touch, same arena.</span></li>
+        </ul>
+      </div>
+
+      <div class="entry-column">
+        <div class="entry-card">
+          <div class="rivet tl"></div><div class="rivet tr"></div><div class="rivet bl"></div><div class="rivet br"></div>
+          <div class="entry-heading">
+            <div>
+              <p class="micro-label">PRIVATE ARENA</p>
+              <h2>Enter the lists</h2>
+            </div>
+            <div class="seal"><svg><use href="#i-shield"></use></svg></div>
+          </div>
+
+          <label class="field-label" for="nickname">WARRIOR NAME</label>
+          <div class="field-wrap">
+            <input id="nickname" class="text-field" type="text" maxlength="20" autocomplete="nickname" placeholder="e.g. Sir Aldric" spellcheck="false">
+            <span class="field-rune">✦</span>
+          </div>
+
+          <div class="segmented" role="tablist" aria-label="Arena entry">
+            <button id="tab-create" class="is-active" type="button" role="tab" aria-selected="true">Create arena</button>
+            <button id="tab-join" type="button" role="tab" aria-selected="false">Join with code</button>
+          </div>
+
+          <form id="create-form" class="entry-form" novalidate>
+            <p class="form-note">Forge a private room and share its six-letter code with your rival.</p>
+            <button id="create-btn" class="btn btn-primary btn-wide" type="submit">
+              <span class="btn-shine"></span>
+              <svg><use href="#i-swords"></use></svg>
+              <span>Create private arena</span>
+            </button>
+          </form>
+
+          <form id="join-form" class="entry-form hidden" novalidate>
+            <label class="field-label" for="room-code">ARENA CODE</label>
+            <input id="room-code" class="code-field" type="text" maxlength="6" inputmode="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ABC234">
+            <button id="join-btn" class="btn btn-primary btn-wide" type="submit">
+              <span class="btn-shine"></span>
+              <svg><use href="#i-flag"></use></svg>
+              <span>Enter the arena</span>
+            </button>
+          </form>
+
+          <div id="home-error" class="form-error hidden" role="alert">
+            <svg><use href="#i-warning"></use></svg><span></span>
+          </div>
+
+          <div class="entry-foot">
+            <span><i class="dot-live"></i> No accounts</span>
+            <span>1 v 1</span>
+            <span>~3 min</span>
+          </div>
+        </div>
+        <p class="entry-caption">One room. Two seats. Both must ready up before the countdown begins.</p>
+      </div>
+    </main>
+
+    <footer class="home-footer">
+      <span>Hand-forged for two players</span>
+      <span class="footer-sep">◆</span>
+      <button type="button" class="text-link" data-modal="help">Controls &amp; rules</button>
+    </footer>
+  </section>
+
+  <!-- LOBBY -->
+  <section id="screen-lobby" class="screen lobby-screen hidden">
+    <div class="lobby-bg"></div>
+    <header class="lobby-header">
+      <div class="brand brand-small">
+        <div class="brand-mark"><svg><use href="#i-swords"></use></svg></div>
+        <div class="brand-text"><strong>IRON &amp; OATH</strong><span>THE WAR ROOM</span></div>
+      </div>
+      <div class="lobby-header-tools">
+        <button id="copy-code-btn" class="code-chip" type="button" title="Copy room code">
+          <span class="micro-label">ARENA CODE</span>
+          <strong id="lobby-code">------</strong>
+          <svg><use href="#i-copy"></use></svg>
+        </button>
+        <button class="icon-btn" type="button" data-action="toggle-sound" aria-label="Toggle sound">
+          <svg class="sound-on"><use href="#i-sound"></use></svg><svg class="sound-off"><use href="#i-mute"></use></svg>
+        </button>
+        <button class="icon-btn" type="button" data-modal="help" aria-label="How to play"><svg><use href="#i-help"></use></svg></button>
+        <button id="lobby-leave-btn" class="btn btn-ghost btn-compact" type="button"><svg><use href="#i-arrow-left"></use></svg><span>Leave</span></button>
+      </div>
+    </header>
+
+    <main class="lobby-main">
+      <div class="lobby-topline">
+        <div>
+          <p class="eyebrow eyebrow-left">THE WAR ROOM</p>
+          <h2 class="screen-title">Choose your oath</h2>
+        </div>
+        <div class="room-state" id="room-state">
+          <span class="pulse-dot"></span>
+          <span>Waiting for both warriors</span>
+        </div>
+      </div>
+
+      <div class="lobby-layout">
+        <aside class="warband-panel">
+          <div class="panel-heading"><h3>THE WARBAND</h3><span id="warband-count">1 / 2</span></div>
+          <div id="lobby-players" class="warband-list"></div>
+
+          <div class="warband-note">
+            <svg><use href="#i-shield"></use></svg>
+            <p>Your opponent sees your choice as you make it. Nothing is hidden in this arena.</p>
+          </div>
+
+          <div class="ready-block">
+            <div id="ready-state" class="ready-state">
+              <span class="ready-dot"></span>
+              <span>Both warriors must confirm and ready.</span>
+            </div>
+            <button id="ready-btn" class="btn btn-primary btn-wide" type="button" disabled>
+              <span class="btn-shine"></span>
+              <span id="ready-btn-label">Ready for battle</span>
+            </button>
+            <button id="confirm-btn" class="btn btn-outline btn-wide" type="button" disabled>
+              <svg><use href="#i-check"></use></svg>
+              <span id="confirm-btn-label">Confirm warrior</span>
+            </button>
+          </div>
+        </aside>
+
+        <section class="choose-panel">
+          <div class="panel-heading">
+            <h3>THE FOUR OATHS</h3>
+            <span>Both warriors may choose the same</span>
+          </div>
+          <div id="character-grid" class="character-grid"></div>
+          <div id="selection-hint" class="selection-hint">
+            <span class="hint-mark">?</span>
+            <p>Select a warrior to inspect their oath. Confirm your choice, then ready for battle.</p>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <div id="lobby-disconnect" class="floating-warning hidden">
+      <svg><use href="#i-warning"></use></svg>
+      <div><strong>Opponent connection lost</strong><span>Their seat is held while they reconnect.</span></div>
+    </div>
+  </section>
+
+  <!-- GAME -->
+  <section id="screen-game" class="screen game-screen hidden">
+    <canvas id="game-canvas" aria-label="Medieval combat arena"></canvas>
+    <div class="game-vignette"></div>
+
+    <header class="game-hud">
+      <div class="hud-player hud-left">
+        <div class="hud-identity">
+          <span class="hud-you" id="hud-you-0">YOU</span>
+          <span class="hud-name" id="hud-name-0">Warrior</span>
+          <span class="hud-character" id="hud-char-0">Knight</span>
+          <span class="hud-conn" id="hud-conn-0" title="Connected"><i></i></span>
+        </div>
+        <div class="health-frame">
+          <div class="health-trail" id="hud-trail-0"></div>
+          <div class="health-fill" id="hud-fill-0"></div>
+          <div class="health-shine"></div>
+          <span class="health-num" id="hud-hp-0">100</span>
+        </div>
+      </div>
+
+      <div class="hud-center">
+        <div class="hud-crest"><svg><use href="#i-swords"></use></svg></div>
+        <div class="hud-vs">VS</div>
+      </div>
+
+      <div class="hud-player hud-right">
+        <div class="hud-identity">
+          <span class="hud-conn" id="hud-conn-1" title="Connected"><i></i></span>
+          <span class="hud-character" id="hud-char-1">Knight</span>
+          <span class="hud-name" id="hud-name-1">Rival</span>
+          <span class="hud-you" id="hud-you-1">YOU</span>
+        </div>
+        <div class="health-frame">
+          <div class="health-trail" id="hud-trail-1"></div>
+          <div class="health-fill" id="hud-fill-1"></div>
+          <div class="health-shine"></div>
+          <span class="health-num" id="hud-hp-1">100</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="game-tools">
+      <div id="game-connection" class="conn-pill conn-compact is-online">
+        <span class="conn-dot"></span><span class="conn-label">Live</span><span id="ping-label" class="ping-label">—</span>
+      </div>
+      <button class="icon-btn icon-btn-dark" type="button" data-action="toggle-sound" aria-label="Toggle sound">
+        <svg class="sound-on"><use href="#i-sound"></use></svg><svg class="sound-off"><use href="#i-mute"></use></svg>
+      </button>
+      <button id="game-menu-btn" class="icon-btn icon-btn-dark" type="button" aria-label="Arena menu"><svg><use href="#i-menu"></use></svg></button>
+    </div>
+
+    <div id="countdown-overlay" class="countdown-overlay hidden">
+      <div class="countdown-ornament"><span></span><svg><use href="#i-swords"></use></svg><span></span></div>
+      <p id="countdown-kicker">STEEL READY</p>
+      <div id="countdown-number" class="countdown-number">3</div>
+      <p id="countdown-sub">The duel begins</p>
+    </div>
+
+    <div id="pause-overlay" class="status-overlay hidden">
+      <div class="status-card">
+        <div class="status-icon"><svg><use href="#i-wifi"></use></svg></div>
+        <h2 id="pause-title">Opponent reconnecting</h2>
+        <p id="pause-text">The duel is paused while their connection returns.</p>
+        <div class="grace-meter"><span id="grace-fill"></span></div>
+        <p class="grace-label" id="grace-label">Holding their seat for 12s</p>
+      </div>
+    </div>
+
+    <div id="connection-overlay" class="status-overlay hidden">
+      <div class="status-card">
+        <div class="status-icon reconnecting"><svg><use href="#i-wifi"></use></svg></div>
+        <h2>Connection lost</h2>
+        <p>Finding your way back to the arena…</p>
+        <div class="loading-bar"><span></span></div>
+        <p class="grace-label">Your seat is being held</p>
+      </div>
+    </div>
+
+    <div id="result-overlay" class="result-overlay hidden">
+      <div class="result-card">
+        <div class="result-rays"></div>
+        <div class="result-crest" id="result-crest"><svg><use href="#i-crown"></use></svg></div>
+        <p class="micro-label" id="result-kicker">THE OATH IS KEPT</p>
+        <h2 id="result-title">VICTORY</h2>
+        <p id="result-subtitle">The arena falls silent.</p>
+        <div id="result-fighters" class="result-fighters"></div>
+        <div id="rematch-status" class="rematch-status">
+          <span id="rematch-status-text">Both warriors must agree to a rematch.</span>
+        </div>
+        <div class="result-actions">
+          <button id="rematch-btn" class="btn btn-primary" type="button"><span class="btn-shine"></span><svg><use href="#i-swords"></use></svg><span>Rematch</span></button>
+          <button id="return-lobby-btn" class="btn btn-outline" type="button"><svg><use href="#i-flag"></use></svg><span>Return to lobby</span></button>
+        </div>
+        <button id="result-leave-btn" class="text-link result-leave" type="button">Leave the arena</button>
+      </div>
+    </div>
+
+    <div class="desktop-controls" id="desktop-controls">
+      <div class="control-key"><kbd>WASD</kbd><span>Move</span></div>
+      <div class="control-key"><kbd>SPACE</kbd><span>Strike</span><i class="key-cd" id="cd-attack"></i></div>
+      <div class="control-key"><kbd>SHIFT</kbd><span>Block</span></div>
+      <div class="control-key"><kbd>E</kbd><span>Dodge</span><i class="key-cd" id="cd-dodge"></i></div>
+    </div>
+
+    <div class="mobile-controls" id="mobile-controls">
+      <div id="joystick-zone" class="joystick-zone">
+        <div class="joystick-ring"><span class="joystick-notches"></span><div id="joystick-knob" class="joystick-knob"></div></div>
+        <span class="joystick-label">MOVE</span>
+      </div>
+      <div class="touch-actions">
+        <button id="touch-attack" class="touch-btn touch-attack" type="button" data-touch-action="attack">
+          <span class="touch-symbol"><svg><use href="#i-swords"></use></svg></span><span class="touch-name">Strike</span><span class="touch-cd"></span>
+        </button>
+        <button id="touch-dodge" class="touch-btn touch-dodge" type="button" data-touch-action="dodge">
+          <span class="touch-symbol"><svg><use href="#i-boot"></use></svg></span><span class="touch-name">Dodge</span><span class="touch-cd"></span>
+        </button>
+        <button id="touch-block" class="touch-btn touch-block" type="button" data-touch-action="block">
+          <span class="touch-symbol"><svg><use href="#i-shield"></use></svg></span><span class="touch-name">Block</span><span class="touch-cd"></span>
+        </button>
+      </div>
+    </div>
+
+    <div id="game-menu" class="modal-backdrop hidden">
+      <div class="modal-card menu-card">
+        <button class="modal-close" type="button" data-close-modal="game-menu"><svg><use href="#i-x"></use></svg></button>
+        <p class="micro-label">PAUSED IN SPIRIT ONLY</p>
+        <h2>Arena menu</h2>
+        <p class="modal-copy">The duel does not pause when this menu opens. Choose quickly.</p>
+        <div class="menu-actions">
+          <button class="btn btn-primary" type="button" data-close-modal="game-menu"><span>Return to the fight</span></button>
+          <button id="game-help-btn" class="btn btn-outline" type="button" data-modal="help"><svg><use href="#i-help"></use></svg><span>Controls &amp; rules</span></button>
+          <button id="game-leave-btn" class="btn btn-danger" type="button"><svg><use href="#i-arrow-left"></use></svg><span>Abandon arena</span></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HELP MODAL -->
+  <div id="help-modal" class="modal-backdrop hidden">
+    <div class="modal-card help-card">
+      <button class="modal-close" type="button" data-close-modal="help-modal"><svg><use href="#i-x"></use></svg></button>
+      <p class="micro-label">THE RULES OF STEEL</p>
+      <h2>Controls &amp; combat</h2>
+      <div class="help-grid">
+        <div class="help-section">
+          <h3>On a keyboard</h3>
+          <div class="help-row"><kbd>W A S D</kbd><span>Move freely</span></div>
+          <div class="help-row"><kbd>SPACE</kbd><span>Strike in your facing direction</span></div>
+          <div class="help-row"><kbd>SHIFT</kbd><span>Hold to block the front arc</span></div>
+          <div class="help-row"><kbd>E</kbd><span>Dodge in your move direction</span></div>
+        </div>
+        <div class="help-section">
+          <h3>On touch</h3>
+          <p>Use the left thumbstick to move. Strike, Block, and Dodge sit under your right thumb. Buttons support multi-touch.</p>
+          <h3 class="mt">The exchange</h3>
+          <p>Blocking turns away attacks from the direction you face. A dodge grants a brief moment of invulnerability. Watch the cooldowns beneath your health bar.</p>
+        </div>
+      </div>
+      <div class="help-tip"><svg><use href="#i-fire"></use></svg><span>No stamina, no timers, no running away. First warrior to fall loses.</span></div>
+      <button class="btn btn-primary btn-wide" type="button" data-close-modal="help-modal"><span>Back to the oath</span></button>
+    </div>
+  </div>
+
+  <script type="module" src="/js/main.js"></script>
+</body>
+</html>
